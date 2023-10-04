@@ -19,11 +19,13 @@ const logger = winston.createLogger({
 // Initialize Twitter client
 const twitterClient = new TwitterApi({
     appKey: process.env.TWITTER_CONSUMER_KEY,
-appSecret: process.env.TWITTER_CONSUMER_SECRET,
-accessToken: process.env.TWITTER_ACCESS_TOKEN_KEY,
-accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
+    appSecret: process.env.TWITTER_CONSUMER_SECRET,
+    accessToken: process.env.TWITTER_ACCESS_TOKEN_KEY,
+    accessSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
 // bearerToken: process.env.TWITTER_BEARER_TOKEN
 });
+
+const v2TwitterClient = new TwitterApi(process.env.BEARER_TOKEN);
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -32,27 +34,30 @@ const openai = new OpenAI({
 
 async function checkTimeline() {
     try {
-        const tweets = await twitterClient.v1.homeTimeline();
-        for (const tweet of tweets.tweets) {
-            // process tweet...
-            const prompt = `The goal is to maximize engagement and relatability to monetize our Twitter account. Analyze the following tweet, and craft a response that is clever if the setting is right, humorous if it's appropriate, and knowledgeable if the tweet indicates a problem, ensuring the response is likely to resonate with a broad audience: "${tweetText}"`;
+        const tweets = await twitterClient.v1.tweet("Hello");
+        console.log(tweets)
+        // for (const tweet of tweets.tweets) {
+        //     // process tweet...
+        //     const prompt = `The goal is to maximize engagement and relatability to monetize our Twitter account. Analyze the following tweet, and craft a response that is clever if the setting is right, humorous if it's appropriate, and knowledgeable if the tweet indicates a problem, ensuring the response is likely to resonate with a broad audience: "${tweetText}"`;
 
-            try {
-                const gptResponse = await openai.complete({
-                    prompt: prompt,
-                    max_tokens: 150,
-                    temperature: 0.7,
-                });
+        //     try {
+        //         const gptResponse = await openai.complete({
+        //             prompt: prompt,
+        //             max_tokens: 150,
+        //             temperature: 0.7,
+        //         });
 
-                const gptReply = gptResponse.choices[0].text.trim();
+        //         const gptReply = gptResponse.choices[0].text.trim();
 
-                await twitterClient.v2.reply(gptReply, tweet.id);
-                lastSeenTweetId = tweet.id;
-            } catch (error) {
-                logger.error('Error processing tweet:', error);
-            }
-        }
+        //         await v2TwitterClient.v2.reply(gptReply, tweet.id);
+        //         lastSeenTweetId = tweet.id;
+        //     } catch (error) {
+        //         console.log('Error processing tweet:', error)
+        //         logger.error('Error processing tweet:', error);
+        //     }
+        // }
     } catch (error) {
+        console.log('Error checking timeline:', error)
         logger.error('Error checking timeline:', error);
     }
 }
