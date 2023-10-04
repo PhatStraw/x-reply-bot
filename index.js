@@ -31,7 +31,9 @@ const v2TwitterClient = new TwitterApi(process.env.BEARER_TOKEN);
 const openai = new OpenAI({
     key: process.env.OPENAI_API_KEY,
 });
-
+app.get("/", (req,res) =>{
+    console.log("Hello World")
+})
 async function checkTimeline() {
     try {
         const tweets = await twitterClient.v1.tweet("Hello");
@@ -57,7 +59,7 @@ async function checkTimeline() {
         //     }
         // }
     } catch (error) {
-        console.log('Error checking timeline:', error)
+        console.log('::::::::::::Error checking timeline::::::::::Error checking timeline:::::::::::', error)
         logger.error('Error checking timeline:', error);
     }
 }
